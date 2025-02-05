@@ -1,20 +1,18 @@
-const fs = require("fs");
-const path = require("path");
+module.exports = ({ env }) => {
+  const isProduction = env("NODE_ENV") === "production"; // تحديد إذا كنا في بيئة الإنتاج أو لا
 
-module.exports = ({ env }) => ({
-  connection: {
-    client: "mysql",
+  return {
     connection: {
-      host: env("DATABASE_HOST"),
-      port: env.int("DATABASE_PORT"),
-      database: env("DATABASE_NAME"),
-      user: env("DATABASE_USERNAME"),
-      password: env("DATABASE_PASSWORD"),
-      ssl: {
-        ca: fs.readFileSync(path.resolve(__dirname, "../certs/ca.pem")), // تحميل شهادة SSL
-        rejectUnauthorized: true, // تأكيد أمان الاتصال
+      client: "mysql",
+      connection: {
+        host: env("DATABASE_HOST"),
+        port: env.int("DATABASE_PORT"),
+        database: env("DATABASE_NAME"),
+        user: env("DATABASE_USERNAME"),
+        password: env("DATABASE_PASSWORD"),
+        ssl: isProduction ? { rejectUnauthorized: true } : false, // تعطيل SSL على localhost
       },
+      debug: false,
     },
-    debug: false,
-  },
-});
+  };
+};
